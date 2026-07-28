@@ -6,6 +6,9 @@ A lightweight, tactical-HUD-styled status dashboard for home servers built on an
 
 ![status](https://img.shields.io/badge/status-stable-58bd8b)
 
+![preview](docs/preview.svg)
+<sub>Mockup ilustrativo (não é um screenshot real) / Illustrative mockup (not a real screenshot).</sub>
+
 ---
 
 ## PT-BR

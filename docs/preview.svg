@@ -1,0 +1,126 @@
+<svg viewBox="0 0 1160 640" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial, sans-serif">
+  <defs>
+    <style>
+      .ink { fill: #f2f2ee; }
+      .muted { fill: #8d948f; }
+      .accent { fill: #55ead4; }
+      .label { font-size: 11px; font-weight: 700; letter-spacing: 1px; }
+      .value { font-size: 15px; font-weight: 700; }
+      .small { font-size: 10px; }
+      .card { fill: #15191b; }
+      .row { fill: #15191b; }
+    </style>
+  </defs>
+
+  <rect width="1160" height="640" fill="#0b0d0e"/>
+
+  <!-- Topbar -->
+  <text x="24" y="38" class="ink" font-size="15" font-weight="800" letter-spacing="2">SENTRY</text>
+  <text x="900" y="38" class="muted small" text-anchor="end">UPTIME 7D 21H</text>
+  <circle cx="1010" cy="33" r="9" fill="#15191b" stroke="#55ead4" stroke-width="1.5"/>
+  <text x="1010" y="37" text-anchor="middle" class="accent" font-size="9" font-weight="800">C</text>
+  <rect x="1030" y="22" width="34" height="22" rx="11" fill="#15191b"/>
+  <text x="1047" y="37" text-anchor="middle" class="muted small" font-weight="800">EN</text>
+
+  <!-- Status column -->
+  <!-- CPU card -->
+  <rect x="24" y="64" width="266" height="76" rx="8" class="card"/>
+  <text x="40" y="88" class="accent label">CPU</text>
+  <text x="40" y="108" class="ink value">3.1%</text>
+  <text x="170" y="88" class="muted small" font-weight="700">C0 3%  C1 2%</text>
+  <text x="170" y="100" class="muted small" font-weight="700">C2 5%  C3 2%</text>
+  <rect x="40" y="122" width="230" height="3" rx="1.5" fill="#232827"/>
+  <rect x="40" y="122" width="10" height="3" rx="1.5" fill="#55ead4"/>
+
+  <!-- Temp card -->
+  <rect x="298" y="64" width="266" height="76" rx="8" class="card"/>
+  <text x="314" y="88" class="accent label">TEMP</text>
+  <text x="314" y="108" class="ink value">53.5 C</text>
+  <rect x="314" y="122" width="230" height="3" rx="1.5" fill="#232827"/>
+  <rect x="314" y="122" width="120" height="3" rx="1.5" fill="#55ead4"/>
+
+  <!-- RAM card -->
+  <rect x="24" y="148" width="266" height="76" rx="8" class="card"/>
+  <text x="40" y="172" class="accent label">RAM</text>
+  <text x="40" y="192" class="ink value">26.6%</text>
+  <text x="40" y="204" class="muted small">1.0 GB / 3.8 GB</text>
+  <text x="170" y="172" class="muted small" font-weight="700">CACHE</text>
+  <text x="170" y="184" class="ink small" font-weight="700">1.0 GB</text>
+  <rect x="40" y="210" width="230" height="3" rx="1.5" fill="#232827"/>
+  <rect x="40" y="210" width="60" height="3" rx="1.5" fill="#55ead4"/>
+
+  <!-- Disks card - full width -->
+  <rect x="298" y="148" width="266" height="76" rx="8" class="card"/>
+  <text x="314" y="172" class="accent label">DISCOS</text>
+  <text x="314" y="192" class="ink value">50.7%</text>
+  <text x="314" y="204" class="muted small">44.7 GB / 87.6 GB</text>
+  <rect x="314" y="212" width="230" height="3" rx="1.5" fill="#232827"/>
+  <rect x="314" y="212" width="107" height="3" fill="#55ead4"/>
+  <rect x="421" y="212" width="123" height="3" fill="#7ff2e6"/>
+
+  <!-- Network cards row (2 columns) -->
+  <rect x="24" y="232" width="266" height="64" rx="8" class="card"/>
+  <text x="40" y="254" class="accent label">ETH0</text>
+  <text x="40" y="272" class="ink small" font-weight="700">Ativo</text>
+  <text x="150" y="254" class="muted small" font-weight="700">DOWN 2.4 KB/s</text>
+  <text x="150" y="266" class="muted small" font-weight="700">UP 4.6 KB/s</text>
+
+  <rect x="298" y="232" width="266" height="64" rx="8" class="card"/>
+  <text x="314" y="254" class="accent label">WLAN0</text>
+  <text x="314" y="272" class="ink small" font-weight="700">Ativo</text>
+  <text x="424" y="254" class="muted small" font-weight="700">DOWN 0 B/s</text>
+  <text x="424" y="266" class="muted small" font-weight="700">UP 0 B/s</text>
+
+  <rect x="24" y="304" width="266" height="64" rx="8" class="card"/>
+  <text x="40" y="326" class="accent label">TAILSCALE0</text>
+  <text x="40" y="344" class="ink small" font-weight="700">Ativo</text>
+  <text x="40" y="358" class="muted small" font-weight="700">DOWN 1.5 KB/s   UP 3.3 KB/s</text>
+
+  <!-- Services column -->
+  <!-- search + toggle -->
+  <rect x="588" y="64" width="470" height="36" rx="6" fill="#15191b"/>
+  <text x="602" y="87" class="muted small">Buscar servico...</text>
+  <rect x="1066" y="64" width="36" height="36" rx="6" fill="#15191b"/>
+  <line x1="1076" y1="76" x2="1092" y2="76" stroke="#8d948f" stroke-width="1.4"/>
+  <line x1="1076" y1="82" x2="1092" y2="82" stroke="#8d948f" stroke-width="1.4"/>
+  <line x1="1076" y1="88" x2="1092" y2="88" stroke="#8d948f" stroke-width="1.4"/>
+
+  <!-- service rows -->
+  <g>
+    <rect x="588" y="112" width="514" height="56" rx="8" fill="#15191b"/>
+    <rect x="602" y="130" width="34" height="22" rx="11" fill="#1f2426"/>
+    <text x="619" y="145" text-anchor="middle" class="accent small" font-weight="800">JF</text>
+    <text x="650" y="136" class="ink" font-size="12" font-weight="700">Jellyfin</text>
+    <text x="650" y="152" class="muted small">filmes, series e musica</text>
+  </g>
+  <g>
+    <rect x="588" y="180" width="514" height="56" rx="8" fill="#15191b"/>
+    <rect x="602" y="198" width="34" height="22" rx="11" fill="#1f2426"/>
+    <text x="619" y="213" text-anchor="middle" class="accent small" font-weight="800">FB</text>
+    <text x="650" y="204" class="ink" font-size="12" font-weight="700">File Browser</text>
+    <text x="650" y="220" class="muted small">mover e organizar arquivos</text>
+  </g>
+  <g>
+    <rect x="588" y="248" width="514" height="56" rx="8" fill="#15191b"/>
+    <rect x="602" y="266" width="34" height="22" rx="11" fill="#1f2426"/>
+    <text x="619" y="281" text-anchor="middle" class="accent small" font-weight="800">TR</text>
+    <text x="650" y="272" class="ink" font-size="12" font-weight="700">Transmission</text>
+    <text x="650" y="288" class="muted small">torrents e downloads</text>
+  </g>
+  <g>
+    <rect x="588" y="316" width="514" height="56" rx="8" fill="#15191b"/>
+    <rect x="602" y="334" width="34" height="22" rx="11" fill="#1f2426"/>
+    <text x="619" y="349" text-anchor="middle" class="accent small" font-weight="800">CM</text>
+    <text x="650" y="340" class="ink" font-size="12" font-weight="700">Camera PTZ</text>
+    <text x="650" y="356" class="muted small">video e controle da camera</text>
+  </g>
+  <g>
+    <rect x="588" y="384" width="514" height="56" rx="8" fill="#15191b"/>
+    <rect x="602" y="402" width="34" height="22" rx="11" fill="#1f2426"/>
+    <text x="619" y="417" text-anchor="middle" class="accent small" font-weight="800">PT</text>
+    <text x="650" y="408" class="ink" font-size="12" font-weight="700">Portainer</text>
+    <text x="650" y="424" class="muted small">gerenciar containers Docker</text>
+  </g>
+
+  <text x="580" y="620" text-anchor="middle" class="muted small" font-style="italic">mockup ilustrativo - nao e um screenshot real</text>
+</svg>
