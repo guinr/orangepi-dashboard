@@ -1,8 +1,8 @@
 # Orange Pi Media Hub
 
-Um dashboard leve para servidores caseiros baseados em Orange Pi (ou qualquer SBC Linux/Docker) — mostra CPU, RAM, discos, rede e temperatura em tempo real, além de uma lista de atalhos para os serviços que você roda (Jellyfin, File Browser, Portainer, etc.).
+Um dashboard leve, com vibe de HUD tático, para servidores caseiros baseados em Orange Pi (ou qualquer SBC Linux/Docker) — mostra CPU, RAM, discos, rede e temperatura em tempo real, além de uma lista de atalhos (com busca e visualização em lista/grade) para os serviços que você roda (Jellyfin, File Browser, Portainer, etc.).
 
-A lightweight status dashboard for home servers built on an Orange Pi (or any Linux/Docker SBC) — live CPU, RAM, disk, network and temperature metrics, plus a shortcut list for whatever services you self-host (Jellyfin, File Browser, Portainer, etc.).
+A lightweight, tactical-HUD-styled status dashboard for home servers built on an Orange Pi (or any Linux/Docker SBC) — live CPU, RAM, disk, network and temperature metrics, plus a searchable shortcut list (list or grid view) for whatever services you self-host (Jellyfin, File Browser, Portainer, etc.).
 
 ![status](https://img.shields.io/badge/status-stable-58bd8b)
 
@@ -17,7 +17,13 @@ Dois containers Docker:
 - **`media-portal`** (nginx) — serve a página estática e faz proxy de `/api/status` para o backend.
 - **`portal-status`** (Flask) — lê `/proc`, `/sys` e `/` do host (montados read-only) e expõe `/status` como JSON. Não depende de nenhum caminho ou IP específico da sua máquina — funciona em qualquer SBC Linux.
 
-A interface tem suporte a português e inglês (alterna pelo botão no canto superior direito, a escolha fica salva no navegador).
+**Recursos da interface:**
+
+- **PT/EN** — botão no topo alterna o idioma, escolha fica salva no navegador.
+- **4 temas de cor** (Ciano, Verde, Âmbar, Vermelho) — um dropdown ao lado do idioma troca entre eles; a página inteira (métricas + ícones dos serviços) segue um único tom por vez, com discos/interfaces de rede diferenciados por variações de claro/escuro dessa mesma cor.
+- **Busca** — campo acima da lista de serviços filtra por nome/descrição em tempo real, sem backend.
+- **Lista ou grade** — botão ao lado da busca alterna entre a lista completa (ícone + nome + descrição) e uma grade compacta (só ícone + nome, tipo launcher de apps).
+- **Layout responsivo** — em telas largas (notebook+), métricas e serviços ficam lado a lado em duas colunas; em telas estreitas, empilha verticalmente.
 
 ### Instalação
 
@@ -77,7 +83,13 @@ Two Docker containers:
 - **`media-portal`** (nginx) — serves the static page and proxies `/api/status` to the backend.
 - **`portal-status`** (Flask) — reads `/proc`, `/sys` and `/` from the host (mounted read-only) and exposes `/status` as JSON. No machine-specific path or IP is hardcoded — it works on any Linux SBC.
 
-The UI supports Portuguese and English (toggle button top-right, choice persisted in the browser).
+**UI features:**
+
+- **PT/EN** — toggle button up top, choice persisted in the browser.
+- **4 color themes** (Cyan, Green, Amber, Red) — a dropdown next to the language toggle switches between them; the whole page (metrics + service icons) follows a single hue at a time, with disks/network interfaces told apart via lighter/darker tonal shades of that same color.
+- **Search** — a field above the service list filters by name/description live, no backend involved.
+- **List or grid view** — a button next to search toggles between the full list (icon + name + description) and a compact grid (icon + name only, app-launcher style).
+- **Responsive layout** — on wide screens (laptop+), metrics and services sit side by side in two columns; on narrow screens, it stacks vertically.
 
 ### Install
 
@@ -99,7 +111,7 @@ Edit `www/config.json`. Every entry under `services` becomes a clickable card:
 {
   "id": "jellyfin",
   "name": "Jellyfin",
-  "description": { "pt": "filmes, series e musica", "en": "movies, shows and music" },
+  "description": { "pt": "filmes, séries e música", "en": "movies, shows and music" },
   "icon": "JF",
   "accent": "blue",
   "port": 8096,
