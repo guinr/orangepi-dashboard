@@ -350,6 +350,31 @@
         gap: 8px;
       }
 
+      .service-search {
+        appearance: none;
+        width: 100%;
+        border: 0;
+        border-radius: 6px;
+        padding: 10px 12px;
+        background: var(--surface-strong);
+        color: var(--ink);
+        font-family: inherit;
+        font-size: 0.82rem;
+      }
+
+      .service-search::placeholder {
+        color: var(--muted);
+      }
+
+      .service-search:focus-visible {
+        outline: 2px solid var(--blue);
+        outline-offset: 2px;
+      }
+
+      .service-row.hidden-by-search {
+        display: none;
+      }
+
       .service-row {
         position: relative;
         display: flex;
@@ -519,6 +544,7 @@
         </aside>
       </section>
 
+      <input type="search" class="service-search" id="service-search" />
       <section class="grid" id="services-grid" aria-label="Services"></section>
     </main>
 
@@ -539,6 +565,8 @@
           swap: "Swap",
           configError: "Nao foi possivel carregar config.json - confira o arquivo www/config.json.",
           noServices: "Nenhum servico configurado ainda - edite www/config.json.",
+          noSearchResults: "Nenhum servico encontrado.",
+          searchPlaceholder: "Buscar servico...",
           days: (n) => (n === 1 ? "1 dia" : `${n} dias`),
         },
         en: {
@@ -556,6 +584,8 @@
           swap: "Swap",
           configError: "Could not load config.json - check the www/config.json file.",
           noServices: "No services configured yet - edit www/config.json.",
+          noSearchResults: "No services found.",
+          searchPlaceholder: "Search services...",
           days: (n) => (n === 1 ? "1 day" : `${n} days`),
         },
       };
@@ -645,6 +675,7 @@
       const diskCards = document.getElementById("disk-cards");
       const netCards = document.getElementById("net-cards");
       const servicesGrid = document.getElementById("services-grid");
+      const serviceSearchInput = document.getElementById("service-search");
 
       function t(key) {
         return STRINGS[currentLang][key];
@@ -841,23 +872,53 @@
         services.forEach((service) => {
           const accent = ACCENT_MAP[service.accent] || service.accent || "var(--teal)";
           const description = (service.description && (service.description[currentLang] || service.description.pt || service.description.en)) || "";
+          const name = service.name || service.id || "";
 
           const link = document.createElement("a");
           link.className = "service-row";
           link.style.setProperty("--accent", accent);
           link.href = serviceUrl(service.port, service.protocol || "http", service.path || "/");
+          link.dataset.search = `${name} ${description}`.toLowerCase();
 
           link.innerHTML = `
             <div class="service-main">
               <div class="service-icon" aria-hidden="true">${service.icon || "?"}</div>
               <div class="service-copy">
-                <h2>${service.name || service.id || ""}</h2>
+                <h2>${name}</h2>
                 <p>${description}</p>
               </div>
             </div>
           `;
           servicesGrid.appendChild(link);
         });
+
+        applyServiceSearchFilter();
+      }
+
+      let serviceSearchQuery = "";
+
+      function applyServiceSearchFilter() {
+        const rows = [...servicesGrid.querySelectorAll(".service-row")];
+        if (!rows.length) return;
+
+        let anyVisible = false;
+        rows.forEach((row) => {
+          const matches = !serviceSearchQuery || (row.dataset.search || "").includes(serviceSearchQuery);
+          row.classList.toggle("hidden-by-search", !matches);
+          if (matches) anyVisible = true;
+        });
+
+        let noResultsHint = servicesGrid.querySelector(".search-empty-hint");
+        if (!anyVisible) {
+          if (!noResultsHint) {
+            noResultsHint = document.createElement("p");
+            noResultsHint.className = "empty-hint search-empty-hint";
+            servicesGrid.appendChild(noResultsHint);
+          }
+          noResultsHint.textContent = t("noSearchResults");
+        } else if (noResultsHint) {
+          noResultsHint.remove();
+        }
       }
 
       function applyTheme(themeId) {
@@ -916,6 +977,7 @@
         themeToggle.textContent = currentThemeName();
         renderThemeMenu();
         tempLabel.textContent = t("temp");
+        serviceSearchInput.placeholder = t("searchPlaceholder");
 
         const title = (serviceConfig && serviceConfig.title && (serviceConfig.title[currentLang] || serviceConfig.title.pt)) || t("brandFallback");
         brandTitle.textContent = title;
@@ -938,6 +1000,11 @@
 
       langToggle.addEventListener("click", () => {
         setLang(currentLang === "pt" ? "en" : "pt");
+      });
+
+      serviceSearchInput.addEventListener("input", () => {
+        serviceSearchQuery = serviceSearchInput.value.trim().toLowerCase();
+        applyServiceSearchFilter();
       });
 
       function renderFromStatus(data) {
