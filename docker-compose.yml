@@ -1,0 +1,21 @@
+services:
+  portal:
+    image: nginx:alpine
+    container_name: media-portal
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./www:/usr/share/nginx/html:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - portal-status
+
+  portal-status:
+    build: ./status_api
+    container_name: portal-status
+    restart: unless-stopped
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/hostfs:ro

@@ -1,0 +1,48 @@
+{
+  "title": {
+    "pt": "Orange Pi Media Hub",
+    "en": "Orange Pi Media Hub"
+  },
+  "services": [
+    {
+      "id": "jellyfin",
+      "name": "Jellyfin",
+      "description": { "pt": "filmes, series e musica", "en": "movies, shows and music" },
+      "icon": "JF",
+      "accent": "blue",
+      "port": 8096,
+      "protocol": "http",
+      "path": "/web/"
+    },
+    {
+      "id": "files",
+      "name": "File Browser",
+      "description": { "pt": "mover e organizar arquivos", "en": "move and organize files" },
+      "icon": "FB",
+      "accent": "leaf",
+      "port": 8081,
+      "protocol": "http",
+      "path": "/"
+    },
+    {
+      "id": "downloads",
+      "name": "Transmission",
+      "description": { "pt": "torrents e downloads", "en": "torrents and downloads" },
+      "icon": "TR",
+      "accent": "red",
+      "port": 9091,
+      "protocol": "http",
+      "path": "/"
+    },
+    {
+      "id": "portainer",
+      "name": "Portainer",
+      "description": { "pt": "gerenciar containers Docker", "en": "manage Docker containers" },
+      "icon": "PT",
+      "accent": "sun",
+      "port": 9443,
+      "protocol": "https",
+      "path": "/"
+    }
+  ]
+}

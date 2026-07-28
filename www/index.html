@@ -1,0 +1,864 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Orange Pi Media Hub</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --ink: #f2f2ee;
+        --muted: #8d948f;
+        --line: rgba(242, 242, 238, 0.08);
+        --paper: #0b0d0e;
+        --surface: #111416;
+        --surface-strong: #15191b;
+        --surface-raised: #1b2023;
+        --teal: #4db6ac;
+        --blue: #7aa7d9;
+        --sun: #d7a84a;
+        --leaf: #8fbf6f;
+        --red: #d37668;
+        --mint: #58bd8b;
+        --shadow: 0 18px 52px rgba(0, 0, 0, 0.28);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        min-height: 100vh;
+        margin: 0;
+        color: var(--ink);
+        font-family:
+          Aptos,
+          "Segoe UI",
+          sans-serif;
+        background: var(--paper);
+      }
+
+      main {
+        display: grid;
+        gap: 8px;
+        width: min(1120px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 28px 0 26px;
+      }
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0;
+        padding: 0 1px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      h1,
+      h2,
+      p {
+        margin: 0;
+      }
+
+      h1 {
+        font-size: clamp(1.5rem, 3vw, 2.6rem);
+        line-height: 1.02;
+        letter-spacing: 0;
+        max-width: 820px;
+      }
+
+      .brand-title {
+        font-size: 0.8rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .status-panel {
+        border-radius: 6px;
+        padding: 14px;
+        background: var(--surface-strong);
+      }
+
+      .status-panel h2 {
+        font-size: 0.95rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .status-head {
+        display: none;
+      }
+
+      .micro-metrics {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+        margin-top: 0;
+      }
+
+      .live-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        width: fit-content;
+        color: var(--muted);
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        white-space: nowrap;
+        text-transform: uppercase;
+      }
+
+      .live-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 999px;
+        background: var(--mint);
+        box-shadow: 0 0 14px rgba(88, 189, 139, 0.45);
+      }
+
+      .micro-card {
+        padding: 4px 0;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        text-align: left;
+      }
+
+      .micro-card.cpu {
+        --accent: var(--blue);
+      }
+
+      .micro-card.mem {
+        --accent: var(--leaf);
+      }
+
+      .micro-card.disk {
+        --accent: var(--sun);
+      }
+
+      .disk-cards {
+        display: contents;
+      }
+
+      .net-cards {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+        grid-column: 1 / -1;
+      }
+
+      .net-cards .micro-card.net:nth-child(2) {
+        text-align: center;
+      }
+
+      .net-cards .micro-card.net:nth-child(2) .stat-row {
+        justify-content: center;
+      }
+
+      .net-cards .micro-card.net:nth-child(3) {
+        text-align: right;
+      }
+
+      .net-cards .micro-card.net:nth-child(3) .stat-row {
+        justify-content: flex-end;
+      }
+
+      .micro-card.net {
+        --accent: var(--teal);
+      }
+
+      .micro-card.temp {
+        --accent: var(--red);
+      }
+
+      .uptime-badge {
+        color: var(--muted);
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        white-space: nowrap;
+        text-transform: uppercase;
+      }
+
+      .gauge {
+        --value: 0;
+        width: 100%;
+        height: 3px;
+        margin: 7px 0 0;
+        border-radius: 999px;
+        background:
+          linear-gradient(to right, var(--accent, var(--teal)) 0 calc(var(--value) * 1%), rgba(255, 255, 255, 0.07) calc(var(--value) * 1%) 100%);
+      }
+
+      .micro-label {
+        color: var(--accent, var(--muted));
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .micro-value {
+        margin-top: 3px;
+        font-size: 0.8rem;
+        font-weight: 700;
+      }
+
+      .disk-bar {
+        display: flex;
+        width: 100%;
+        height: 3px;
+        margin-top: 7px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.07);
+        overflow: hidden;
+      }
+
+      .disk-segment {
+        flex: 0 0 auto;
+        height: 100%;
+      }
+
+      .disk-legend-dot {
+        display: inline-block;
+        width: 7px;
+        height: 7px;
+        margin-right: 4px;
+        border-radius: 999px;
+      }
+
+      .micro-sub {
+        margin-top: 3px;
+        color: var(--muted);
+        font-size: 0.72rem;
+      }
+
+      .stat-row {
+        display: flex;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 6px 16px;
+      }
+
+      .mini-stats {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .mini-stat {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .mini-stat span {
+        color: var(--muted);
+        font-size: 0.6rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      .mini-stat strong {
+        margin-top: 3px;
+        color: var(--ink);
+        font-size: 0.8rem;
+        font-weight: 700;
+      }
+
+      .micro-card small {
+        display: block;
+        margin-top: 1px;
+        color: var(--muted);
+        font-size: 0.62rem;
+        font-weight: 500;
+        white-space: nowrap;
+      }
+
+      .topbar-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        flex: 0 0 auto;
+      }
+
+      .lang-toggle {
+        appearance: none;
+        border: 0;
+        border-radius: 999px;
+        padding: 3px 10px;
+        color: var(--muted);
+        background: var(--surface-strong);
+        font-size: 0.64rem;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: background-color 150ms ease, color 150ms ease;
+      }
+
+      .lang-toggle:hover,
+      .lang-toggle:focus-visible {
+        color: var(--ink);
+        background: var(--surface-raised);
+      }
+
+      .grid {
+        display: grid;
+        gap: 8px;
+      }
+
+      .service-row {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        overflow: hidden;
+        padding: 12px 14px;
+        border-radius: 6px;
+        color: inherit;
+        text-decoration: none;
+        background: var(--surface-strong);
+        transition: background-color 180ms ease;
+      }
+
+      .service-row:hover,
+      .service-row:focus-visible {
+        background: var(--surface-raised);
+      }
+
+      .service-row:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 3px;
+      }
+
+      .service-icon {
+        display: inline-flex;
+        align-items: center;
+        width: fit-content;
+        min-width: 38px;
+        height: 24px;
+        justify-content: center;
+        padding: 0 9px;
+        border-radius: 999px;
+        color: color-mix(in srgb, var(--accent), white 18%);
+        font-size: 0.72rem;
+        font-weight: 800;
+        background: rgba(255, 255, 255, 0.045);
+      }
+
+      .service-main {
+        display: flex;
+        align-items: center;
+        min-width: 0;
+        gap: 12px;
+      }
+
+      .service-copy {
+        min-width: 0;
+        padding-right: 20px;
+      }
+
+      .service-copy h2 {
+        font-size: 0.95rem;
+        line-height: 1.1;
+      }
+
+      .service-copy p {
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 0.72rem;
+        line-height: 1.2;
+      }
+
+      .empty-hint {
+        padding: 12px 14px;
+        border-radius: 6px;
+        background: var(--surface-strong);
+        color: var(--muted);
+        font-size: 0.78rem;
+      }
+
+      @media (max-width: 920px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+
+        .micro-metrics {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 620px) {
+        main {
+          width: min(100% - 22px, 1120px);
+          padding-top: 16px;
+        }
+
+        .topbar {
+          align-items: center;
+          flex-direction: row;
+          justify-content: space-between;
+        }
+
+        .grid {
+          grid-template-columns: 1fr;
+        }
+
+        .service-row {
+          gap: 10px;
+          padding: 10px 12px;
+        }
+
+        .service-main {
+          gap: 10px;
+        }
+
+        .service-copy h2 {
+          font-size: 0.9rem;
+        }
+
+        .service-copy p {
+          font-size: 0.68rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header class="topbar">
+        <div class="brand">
+          <p class="brand-title" id="brand-title">Orange Pi Media Hub</p>
+        </div>
+        <div class="topbar-status">
+          <span class="uptime-badge" id="uptime-status">Uptime --</span>
+          <span class="live-badge" id="live-status"><span class="live-dot"></span><span id="live-status-text"></span></span>
+          <button type="button" class="lang-toggle" id="lang-toggle"></button>
+        </div>
+      </header>
+
+      <section class="hero" aria-label="System summary">
+        <div></div>
+        <aside class="status-panel" aria-label="System status">
+          <div class="micro-metrics">
+            <article class="micro-card cpu">
+              <div class="stat-row">
+                <div>
+                  <div class="micro-label">CPU</div>
+                  <div class="micro-value" id="cpu-value">--</div>
+                </div>
+                <div class="mini-stats" id="cpu-cores"></div>
+              </div>
+              <div class="gauge" id="cpu-gauge"></div>
+            </article>
+            <article class="micro-card temp">
+              <div class="micro-label" id="temp-label">Temp</div>
+              <div class="micro-value" id="temp-value">--</div>
+              <div class="gauge" id="temp-gauge"></div>
+            </article>
+            <article class="micro-card mem">
+              <div class="stat-row">
+                <div>
+                  <div class="micro-label">RAM</div>
+                  <div class="micro-value" id="mem-value">--</div>
+                  <small id="mem-value-detail"></small>
+                </div>
+                <div class="mini-stats" id="mem-detail"></div>
+              </div>
+              <div class="gauge" id="mem-gauge"></div>
+            </article>
+            <div class="disk-cards" id="disk-cards"></div>
+            <div class="net-cards" id="net-cards"></div>
+          </div>
+        </aside>
+      </section>
+
+      <section class="grid" id="services-grid" aria-label="Services"></section>
+    </main>
+
+    <script>
+      const STRINGS = {
+        pt: {
+          brandFallback: "Orange Pi Media Hub",
+          updating: "Atualizando",
+          live: "Ao vivo",
+          noReading: "Sem leitura",
+          uptimePrefix: "Uptime",
+          temp: "Temp",
+          disks: "Discos",
+          network: "Rede",
+          system: "Sistema",
+          active: "Ativo",
+          inactive: "Inativo",
+          down: "Down",
+          up: "Up",
+          cache: "Cache",
+          swap: "Swap",
+          langToggle: "EN",
+          configError: "Nao foi possivel carregar config.json - confira o arquivo www/config.json.",
+          noServices: "Nenhum servico configurado ainda - edite www/config.json.",
+          days: (n) => (n === 1 ? "1 dia" : `${n} dias`),
+        },
+        en: {
+          brandFallback: "Orange Pi Media Hub",
+          updating: "Updating",
+          live: "Live",
+          noReading: "No signal",
+          uptimePrefix: "Uptime",
+          temp: "Temp",
+          disks: "Disks",
+          network: "Network",
+          system: "System",
+          active: "Active",
+          inactive: "Inactive",
+          down: "Down",
+          up: "Up",
+          cache: "Cache",
+          swap: "Swap",
+          langToggle: "PT",
+          configError: "Could not load config.json - check the www/config.json file.",
+          noServices: "No services configured yet - edit www/config.json.",
+          days: (n) => (n === 1 ? "1 day" : `${n} days`),
+        },
+      };
+
+      const LANG_STORAGE_KEY = "op-dashboard-lang";
+      function detectDefaultLang() {
+        const stored = localStorage.getItem(LANG_STORAGE_KEY);
+        if (stored === "pt" || stored === "en") return stored;
+        return (navigator.language || "pt").toLowerCase().startsWith("pt") ? "pt" : "en";
+      }
+      let currentLang = detectDefaultLang();
+      let lastStatus = null;
+      let serviceConfig = null;
+
+      const ACCENT_MAP = { blue: "var(--blue)", leaf: "var(--leaf)", red: "var(--red)", teal: "var(--teal)", sun: "var(--sun)", mint: "var(--mint)" };
+      const DISK_COLORS = ["var(--sun)", "var(--blue)", "var(--leaf)", "var(--red)", "var(--teal)", "var(--mint)"];
+
+      const brandTitle = document.getElementById("brand-title");
+      const langToggle = document.getElementById("lang-toggle");
+      const liveStatus = document.getElementById("live-status");
+      const liveStatusText = document.getElementById("live-status-text");
+      const uptimeStatus = document.getElementById("uptime-status");
+      const tempLabel = document.getElementById("temp-label");
+      const cpuGauge = document.getElementById("cpu-gauge");
+      const memGauge = document.getElementById("mem-gauge");
+      const tempGauge = document.getElementById("temp-gauge");
+      const cpuValue = document.getElementById("cpu-value");
+      const cpuCores = document.getElementById("cpu-cores");
+      const tempValue = document.getElementById("temp-value");
+      const memValue = document.getElementById("mem-value");
+      const memValueDetail = document.getElementById("mem-value-detail");
+      const memDetail = document.getElementById("mem-detail");
+      const diskCards = document.getElementById("disk-cards");
+      const netCards = document.getElementById("net-cards");
+      const servicesGrid = document.getElementById("services-grid");
+
+      function t(key) {
+        return STRINGS[currentLang][key];
+      }
+
+      function serviceUrl(port, protocol = "http", path = "/") {
+        const host = window.location.hostname || window.location.host || "localhost";
+        return `${protocol}://${host}:${port}${path}`;
+      }
+
+      function setGauge(element, value, max = 100) {
+        const safe = Math.max(0, Math.min(100, (value / max) * 100));
+        element.style.setProperty("--value", safe.toFixed(1));
+      }
+
+      function humanBytes(num) {
+        const units = ["B", "KB", "MB", "GB", "TB"];
+        let value = Number(num);
+        for (const unit of units) {
+          if (value < 1024 || unit === units[units.length - 1]) {
+            return unit === "B" ? `${Math.round(value)} ${unit}` : `${value.toFixed(1)} ${unit}`;
+          }
+          value /= 1024;
+        }
+        return `${value.toFixed(1)} TB`;
+      }
+
+      function formatUptime(seconds) {
+        if (seconds === null || seconds === undefined) {
+          return { compact: "N/A", detail: "" };
+        }
+        const days = Math.floor(seconds / 86400);
+        const hours = Math.floor((seconds % 86400) / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+
+        let compact;
+        if (days > 0) compact = `${days}d ${hours}h`;
+        else if (hours > 0) compact = `${hours}h ${minutes}min`;
+        else compact = `${minutes}min`;
+
+        const parts = [];
+        if (days > 0) parts.push(t("days")(days));
+        if (days > 0 || hours > 0) parts.push(`${hours}h`);
+        parts.push(`${minutes}min`);
+
+        return { compact, detail: parts.join(", ") };
+      }
+
+      function renderMiniStats(container, items) {
+        container.innerHTML = "";
+        items.forEach((item) => {
+          const cell = document.createElement("div");
+          cell.className = "mini-stat";
+          cell.innerHTML = `<span>${item.label}</span><strong>${item.value}</strong>`;
+          container.appendChild(cell);
+        });
+      }
+
+      function renderCpuCores(cores) {
+        if (!cores || !cores.length) {
+          cpuCores.textContent = "--";
+          return;
+        }
+        renderMiniStats(
+          cpuCores,
+          cores.map((core) => ({ label: `C${core.core}`, value: `${core.percent.toFixed(0)}%` })),
+        );
+      }
+
+      function renderDisks(disks) {
+        const list = disks && disks.length ? disks : [];
+        diskCards.innerHTML = "";
+
+        const card = document.createElement("article");
+        card.className = "micro-card disk";
+
+        const row = document.createElement("div");
+        row.className = "stat-row";
+
+        const main = document.createElement("div");
+        const label = document.createElement("div");
+        label.className = "micro-label";
+        label.textContent = t("disks");
+        main.appendChild(label);
+
+        const totalUsed = list.reduce((sum, disk) => sum + disk.used_bytes, 0);
+        const totalCapacity = list.reduce((sum, disk) => sum + disk.total_bytes, 0);
+        const overallPercent = totalCapacity ? (totalUsed / totalCapacity) * 100 : 0;
+        const value = document.createElement("div");
+        value.className = "micro-value";
+        value.textContent = list.length ? `${overallPercent.toFixed(1)}%` : "--";
+        main.appendChild(value);
+
+        if (list.length) {
+          const totalText = document.createElement("small");
+          totalText.textContent = `${humanBytes(totalUsed)} / ${humanBytes(totalCapacity)}`;
+          main.appendChild(totalText);
+        }
+
+        row.appendChild(main);
+
+        const bar = document.createElement("div");
+        bar.className = "disk-bar";
+        const legend = document.createElement("div");
+        legend.className = "mini-stats";
+
+        const slot = list.length ? 100 / list.length : 0;
+
+        list.forEach((disk, index) => {
+          const color = DISK_COLORS[index % DISK_COLORS.length];
+          const width = (slot * Math.max(0, Math.min(100, disk.percent))) / 100;
+          const displayLabel = disk.is_root || !disk.label ? t("system") : disk.label;
+
+          const segment = document.createElement("div");
+          segment.className = "disk-segment";
+          segment.style.width = `${width}%`;
+          segment.style.background = color;
+          segment.title = `${displayLabel}: ${disk.percent.toFixed(1)}% (${disk.used_text})`;
+          bar.appendChild(segment);
+
+          const item = document.createElement("div");
+          item.className = "mini-stat";
+          item.innerHTML = `<span><span class="disk-legend-dot" style="background:${color}"></span>${displayLabel}</span><strong>${disk.percent.toFixed(1)}%</strong><small>${disk.used_text}</small>`;
+          legend.appendChild(item);
+        });
+
+        row.appendChild(legend);
+        card.appendChild(row);
+        card.appendChild(bar);
+        diskCards.appendChild(card);
+      }
+
+      function renderNetworks(networks) {
+        const list = networks || [];
+        netCards.innerHTML = "";
+
+        if (list.length === 0) {
+          const card = document.createElement("article");
+          card.className = "micro-card net";
+          card.innerHTML = `<div class="micro-label">${t("network")}</div><div class="micro-value">--</div>`;
+          netCards.appendChild(card);
+          return;
+        }
+
+        list.forEach((net, index) => {
+          const card = document.createElement("article");
+          card.className = "micro-card net";
+          card.style.setProperty("--accent", DISK_COLORS[index % DISK_COLORS.length]);
+
+          const row = document.createElement("div");
+          row.className = "stat-row";
+
+          const main = document.createElement("div");
+          main.innerHTML = `
+            <div class="micro-label">${net.iface}</div>
+            <div class="micro-value">${net.up ? t("active") : t("inactive")}</div>
+          `;
+          row.appendChild(main);
+
+          const stats = document.createElement("div");
+          stats.className = "mini-stats";
+          renderMiniStats(stats, [
+            { label: t("down"), value: net.rx_text },
+            { label: t("up"), value: net.tx_text },
+          ]);
+          row.appendChild(stats);
+
+          card.appendChild(row);
+          netCards.appendChild(card);
+        });
+      }
+
+      function renderServices(config) {
+        servicesGrid.innerHTML = "";
+        if (!config) {
+          const hint = document.createElement("p");
+          hint.className = "empty-hint";
+          hint.textContent = t("configError");
+          servicesGrid.appendChild(hint);
+          return;
+        }
+
+        const services = config.services || [];
+        if (!services.length) {
+          const hint = document.createElement("p");
+          hint.className = "empty-hint";
+          hint.textContent = t("noServices");
+          servicesGrid.appendChild(hint);
+          return;
+        }
+
+        services.forEach((service) => {
+          const accent = ACCENT_MAP[service.accent] || service.accent || "var(--teal)";
+          const description = (service.description && (service.description[currentLang] || service.description.pt || service.description.en)) || "";
+
+          const link = document.createElement("a");
+          link.className = "service-row";
+          link.style.setProperty("--accent", accent);
+          link.href = serviceUrl(service.port, service.protocol || "http", service.path || "/");
+
+          link.innerHTML = `
+            <div class="service-main">
+              <div class="service-icon" aria-hidden="true">${service.icon || "?"}</div>
+              <div class="service-copy">
+                <h2>${service.name || service.id || ""}</h2>
+                <p>${description}</p>
+              </div>
+            </div>
+          `;
+          servicesGrid.appendChild(link);
+        });
+      }
+
+      function applyTexts() {
+        document.documentElement.lang = currentLang === "pt" ? "pt-BR" : "en";
+        langToggle.textContent = t("langToggle");
+        langToggle.title = currentLang === "pt" ? "Switch to English" : "Mudar para portugues";
+        tempLabel.textContent = t("temp");
+
+        const title = (serviceConfig && serviceConfig.title && (serviceConfig.title[currentLang] || serviceConfig.title.pt)) || t("brandFallback");
+        brandTitle.textContent = title;
+        document.title = title;
+
+        renderServices(serviceConfig);
+
+        if (lastStatus) {
+          renderFromStatus(lastStatus);
+        } else {
+          liveStatusText.textContent = t("updating");
+          uptimeStatus.textContent = `${t("uptimePrefix")} --`;
+        }
+      }
+
+      function setLang(lang) {
+        currentLang = lang;
+        localStorage.setItem(LANG_STORAGE_KEY, lang);
+        applyTexts();
+      }
+
+      langToggle.addEventListener("click", () => {
+        setLang(currentLang === "pt" ? "en" : "pt");
+      });
+
+      function renderFromStatus(data) {
+        cpuValue.textContent = `${data.cpu.percent.toFixed(1)}%`;
+        setGauge(cpuGauge, data.cpu.percent);
+        renderCpuCores(data.cpu.cores);
+        tempValue.textContent = data.temperature.celsius === null ? "N/A" : `${data.temperature.celsius.toFixed(1)} C`;
+        setGauge(tempGauge, data.temperature.celsius ?? 0, 100);
+        memValue.textContent = `${data.memory.percent.toFixed(1)}%`;
+        memValueDetail.textContent = data.memory.used_text;
+        setGauge(memGauge, data.memory.percent);
+        const memItems = [{ label: t("cache"), value: data.memory.cached_text }];
+        if (data.memory.swap_total_bytes) {
+          memItems.push({ label: t("swap"), value: `${data.memory.swap_percent.toFixed(0)}%` });
+        }
+        renderMiniStats(memDetail, memItems);
+        renderDisks(data.disks);
+        const uptime = formatUptime(data.uptime.seconds);
+        uptimeStatus.textContent = `${t("uptimePrefix")} ${uptime.compact}`;
+        uptimeStatus.title = uptime.detail;
+        renderNetworks(data.networks);
+      }
+
+      async function refreshStatus() {
+        try {
+          const response = await fetch("/api/status", { cache: "no-store" });
+          if (!response.ok) {
+            throw new Error("status fetch failed");
+          }
+          const data = await response.json();
+          lastStatus = data;
+          renderFromStatus(data);
+          liveStatusText.textContent = t("live");
+        } catch (error) {
+          liveStatusText.textContent = t("noReading");
+        }
+      }
+
+      async function loadConfig() {
+        try {
+          const response = await fetch("config.json", { cache: "no-store" });
+          if (!response.ok) throw new Error("config fetch failed");
+          serviceConfig = await response.json();
+        } catch (error) {
+          serviceConfig = null;
+        }
+      }
+
+      (async function init() {
+        liveStatusText.textContent = t("updating");
+        langToggle.textContent = t("langToggle");
+        await loadConfig();
+        applyTexts();
+        refreshStatus();
+        setInterval(refreshStatus, 5000);
+      })();
+    </script>
+  </body>
+</html>
