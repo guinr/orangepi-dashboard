@@ -503,7 +503,6 @@
           up: "Up",
           cache: "Cache",
           swap: "Swap",
-          langToggle: "EN",
           configError: "Nao foi possivel carregar config.json - confira o arquivo www/config.json.",
           noServices: "Nenhum servico configurado ainda - edite www/config.json.",
           days: (n) => (n === 1 ? "1 dia" : `${n} dias`),
@@ -524,7 +523,6 @@
           up: "Up",
           cache: "Cache",
           swap: "Swap",
-          langToggle: "PT",
           configError: "Could not load config.json - check the www/config.json file.",
           noServices: "No services configured yet - edit www/config.json.",
           days: (n) => (n === 1 ? "1 day" : `${n} days`),
@@ -777,7 +775,7 @@
 
       function applyTexts() {
         document.documentElement.lang = currentLang === "pt" ? "pt-BR" : "en";
-        langToggle.textContent = t("langToggle");
+        langToggle.textContent = currentLang.toUpperCase();
         langToggle.title = currentLang === "pt" ? "Switch to English" : "Mudar para portugues";
         tempLabel.textContent = t("temp");
 
@@ -853,7 +851,7 @@
 
       (async function init() {
         liveStatusText.textContent = t("updating");
-        langToggle.textContent = t("langToggle");
+        langToggle.textContent = currentLang.toUpperCase();
         await loadConfig();
         applyTexts();
         refreshStatus();
