@@ -124,30 +124,15 @@
       }
 
       .disk-cards {
-        display: contents;
+        display: grid;
+        grid-column: 1 / -1;
       }
 
       .net-cards {
         display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 8px;
         grid-column: 1 / -1;
-      }
-
-      .net-cards .micro-card.net:nth-child(2) {
-        text-align: center;
-      }
-
-      .net-cards .micro-card.net:nth-child(2) .stat-row {
-        justify-content: center;
-      }
-
-      .net-cards .micro-card.net:nth-child(3) {
-        text-align: right;
-      }
-
-      .net-cards .micro-card.net:nth-child(3) .stat-row {
-        justify-content: flex-end;
       }
 
       .micro-card.net {
@@ -377,12 +362,14 @@
       }
 
       .view-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
         flex: 0 0 auto;
         width: 38px;
         height: 38px;
         border-radius: 6px;
         padding: 0;
-        font-size: 0.95rem;
       }
 
       .service-search {
@@ -1055,9 +1042,14 @@
         }
       });
 
+      const VIEW_ICONS = {
+        list: '<svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="2" y1="4" x2="14" y2="4"/><line x1="2" y1="8" x2="14" y2="8"/><line x1="2" y1="12" x2="14" y2="12"/></svg>',
+        grid: '<svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg>',
+      };
+
       function applyView() {
         servicesGrid.classList.toggle("view-grid", currentView === "grid");
-        viewToggle.textContent = currentView === "grid" ? "⊞" : "≡";
+        viewToggle.innerHTML = currentView === "grid" ? VIEW_ICONS.grid : VIEW_ICONS.list;
         viewToggle.title =
           currentLang === "pt"
             ? currentView === "grid"
