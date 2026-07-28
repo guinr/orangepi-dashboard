@@ -121,7 +121,7 @@
         height: 6px;
         border-radius: 999px;
         background: var(--mint);
-        box-shadow: 0 0 14px rgba(88, 189, 139, 0.45);
+        box-shadow: 0 0 14px var(--accent-glow, rgba(88, 189, 139, 0.45));
       }
 
       .micro-card {
@@ -311,6 +311,25 @@
         background: var(--surface-raised);
       }
 
+      .theme-toggle {
+        appearance: none;
+        border: 0;
+        border-radius: 999px;
+        width: 20px;
+        height: 20px;
+        padding: 0;
+        color: var(--blue);
+        background: var(--surface-strong);
+        font-size: 0.7rem;
+        cursor: pointer;
+        transition: background-color 150ms ease;
+      }
+
+      .theme-toggle:hover,
+      .theme-toggle:focus-visible {
+        background: var(--surface-raised);
+      }
+
       .grid {
         display: grid;
         gap: 8px;
@@ -442,6 +461,7 @@
         <div class="topbar-status">
           <span class="uptime-badge" id="uptime-status">Uptime --</span>
           <span class="live-badge" id="live-status"><span class="live-dot"></span><span id="live-status-text"></span></span>
+          <button type="button" class="theme-toggle" id="theme-toggle">&#9679;</button>
           <button type="button" class="lang-toggle" id="lang-toggle"></button>
         </div>
       </header>
@@ -540,9 +560,71 @@
       let serviceConfig = null;
 
       const ACCENT_MAP = { blue: "var(--blue)", leaf: "var(--leaf)", red: "var(--red)", teal: "var(--teal)", sun: "var(--sun)", mint: "var(--mint)" };
-      const DISK_COLORS = ["var(--sun)", "var(--blue)", "var(--leaf)", "var(--red)", "var(--teal)", "var(--mint)"];
+
+      const THEMES = [
+        { id: "cyan", hex: "#55ead4", name: { pt: "Ciano", en: "Cyan" } },
+        { id: "green", hex: "#3ef25a", name: { pt: "Verde", en: "Green" } },
+        { id: "amber", hex: "#ffb000", name: { pt: "Ambar", en: "Amber" } },
+        { id: "red", hex: "#ff3b30", name: { pt: "Vermelho", en: "Red" } },
+      ];
+      const THEME_STORAGE_KEY = "op-dashboard-theme";
+      function detectDefaultTheme() {
+        const stored = localStorage.getItem(THEME_STORAGE_KEY);
+        return THEMES.some((theme) => theme.id === stored) ? stored : THEMES[0].id;
+      }
+      let currentTheme = detectDefaultTheme();
+
+      function hexToHsl(hex) {
+        const r = parseInt(hex.slice(1, 3), 16) / 255;
+        const g = parseInt(hex.slice(3, 5), 16) / 255;
+        const b = parseInt(hex.slice(5, 7), 16) / 255;
+        const max = Math.max(r, g, b);
+        const min = Math.min(r, g, b);
+        let h = 0;
+        let s = 0;
+        const l = (max + min) / 2;
+        if (max !== min) {
+          const d = max - min;
+          s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+          if (max === r) h = (g - b) / d + (g < b ? 6 : 0);
+          else if (max === g) h = (b - r) / d + 2;
+          else h = (r - g) / d + 4;
+          h /= 6;
+        }
+        return { h: h * 360, s: s * 100, l: l * 100 };
+      }
+
+      function hexToRgba(hex, alpha) {
+        const r = parseInt(hex.slice(1, 3), 16);
+        const g = parseInt(hex.slice(3, 5), 16);
+        const b = parseInt(hex.slice(5, 7), 16);
+        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+      }
+
+      function currentThemeHex() {
+        return (THEMES.find((theme) => theme.id === currentTheme) || THEMES[0]).hex;
+      }
+
+      function currentThemeName() {
+        const theme = THEMES.find((t) => t.id === currentTheme) || THEMES[0];
+        return theme.name[currentLang] || theme.name.pt;
+      }
+
+      // Generates `count` evenly-spaced lightness variants of the active theme's
+      // hue/saturation - used to tell apart multiple disks/network interfaces
+      // without ever needing more base hues than the single active theme provides.
+      function shadesFor(hex, count) {
+        const { h, s } = hexToHsl(hex);
+        const n = Math.max(1, count);
+        if (n === 1) return [`hsl(${h.toFixed(1)} ${s.toFixed(1)}% 62%)`];
+        const lMin = 34;
+        const lMax = 80;
+        const step = (lMax - lMin) / (n - 1);
+        return Array.from({ length: n }, (_, i) => `hsl(${h.toFixed(1)} ${s.toFixed(1)}% ${(lMin + step * i).toFixed(1)}%)`);
+      }
 
       const brandTitle = document.getElementById("brand-title");
+      const themeToggle = document.getElementById("theme-toggle");
       const langToggle = document.getElementById("lang-toggle");
       const liveStatus = document.getElementById("live-status");
       const liveStatusText = document.getElementById("live-status-text");
@@ -667,9 +749,10 @@
         legend.className = "mini-stats";
 
         const slot = list.length ? 100 / list.length : 0;
+        const colors = shadesFor(currentThemeHex(), list.length);
 
         list.forEach((disk, index) => {
-          const color = DISK_COLORS[index % DISK_COLORS.length];
+          const color = colors[index];
           const width = (slot * Math.max(0, Math.min(100, disk.percent))) / 100;
           const displayLabel = disk.is_root || !disk.label ? t("system") : disk.label;
 
@@ -704,10 +787,11 @@
           return;
         }
 
+        const netColors = shadesFor(currentThemeHex(), list.length);
         list.forEach((net, index) => {
           const card = document.createElement("article");
           card.className = "micro-card net";
-          card.style.setProperty("--accent", DISK_COLORS[index % DISK_COLORS.length]);
+          card.style.setProperty("--accent", netColors[index]);
 
           const row = document.createElement("div");
           row.className = "stat-row";
@@ -773,10 +857,35 @@
         });
       }
 
+      function applyTheme(themeId) {
+        currentTheme = themeId;
+        localStorage.setItem(THEME_STORAGE_KEY, themeId);
+        const hex = currentThemeHex();
+        const root = document.documentElement.style;
+        ["--blue", "--leaf", "--sun", "--red", "--teal", "--mint"].forEach((variable) => root.setProperty(variable, hex));
+        root.setProperty("--accent-glow", hexToRgba(hex, 0.45));
+        updateThemeTooltip();
+        // Service icons and gauges read colors through CSS variables, so they
+        // repaint on their own - only disks/networks bake in concrete tonal
+        // values at render time and need an explicit re-render here.
+        if (lastStatus) renderFromStatus(lastStatus);
+      }
+
+      function updateThemeTooltip() {
+        themeToggle.title =
+          currentLang === "pt" ? `Tema: ${currentThemeName()} (clique para trocar)` : `Theme: ${currentThemeName()} (click to change)`;
+      }
+
+      themeToggle.addEventListener("click", () => {
+        const idx = THEMES.findIndex((theme) => theme.id === currentTheme);
+        applyTheme(THEMES[(idx + 1) % THEMES.length].id);
+      });
+
       function applyTexts() {
         document.documentElement.lang = currentLang === "pt" ? "pt-BR" : "en";
         langToggle.textContent = currentLang.toUpperCase();
         langToggle.title = currentLang === "pt" ? "Switch to English" : "Mudar para portugues";
+        updateThemeTooltip();
         tempLabel.textContent = t("temp");
 
         const title = (serviceConfig && serviceConfig.title && (serviceConfig.title[currentLang] || serviceConfig.title.pt)) || t("brandFallback");
@@ -852,6 +961,7 @@
       (async function init() {
         liveStatusText.textContent = t("updating");
         langToggle.textContent = currentLang.toUpperCase();
+        applyTheme(currentTheme);
         await loadConfig();
         applyTexts();
         refreshStatus();
