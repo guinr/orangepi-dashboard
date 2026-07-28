@@ -39,7 +39,7 @@ Edite `www/config.json`. Cada entrada em `services` vira um card clicável na p�
 {
   "id": "jellyfin",
   "name": "Jellyfin",
-  "description": { "pt": "filmes, series e musica", "en": "movies, shows and music" },
+  "description": { "pt": "filmes, séries e música", "en": "movies, shows and music" },
   "icon": "JF",
   "accent": "blue",
   "port": 8096,
@@ -50,7 +50,7 @@ Edite `www/config.json`. Cada entrada em `services` vira um card clicável na p�
 
 - `icon`: até 3 caracteres, aparece na bolha colorida do card.
 - `accent`: uma das cores prontas — `blue`, `leaf`, `red`, `teal`, `sun`, `mint` — ou qualquer cor CSS válida (`#ff8800`, `rgb(...)`).
-- `port` / `protocol` / `path`: o link do card é montado como `protocol://<hostname-da-pagina>:port/path` — assim funciona tanto acessando pelo IP local quanto por um túnel/VPN (Tailscale, etc.), sem hardcodar IP nenhum.
+- `port` / `protocol` / `path`: o link do card é montado como `protocol://<hostname-da-página>:port/path` — assim funciona tanto acessando pelo IP local quanto por um túnel/VPN (Tailscale, etc.), sem hardcodar IP nenhum.
 - `description`: objeto com `pt` e `en`; se faltar um dos dois, cai no outro.
 
 Não precisa mexer em HTML/CSS/JS para adicionar, remover ou reordenar serviços — só editar esse arquivo e recarregar a página (é servido estático, sem rebuild).

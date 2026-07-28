@@ -563,10 +563,10 @@
           up: "Up",
           cache: "Cache",
           swap: "Swap",
-          configError: "Nao foi possivel carregar config.json - confira o arquivo www/config.json.",
-          noServices: "Nenhum servico configurado ainda - edite www/config.json.",
-          noSearchResults: "Nenhum servico encontrado.",
-          searchPlaceholder: "Buscar servico...",
+          configError: "Não foi possível carregar config.json - confira o arquivo www/config.json.",
+          noServices: "Nenhum serviço configurado ainda - edite www/config.json.",
+          noSearchResults: "Nenhum serviço encontrado.",
+          searchPlaceholder: "Buscar serviço...",
           days: (n) => (n === 1 ? "1 dia" : `${n} dias`),
         },
         en: {
@@ -605,7 +605,7 @@
       const THEMES = [
         { id: "cyan", hex: "#55ead4", name: { pt: "Ciano", en: "Cyan" } },
         { id: "green", hex: "#3ef25a", name: { pt: "Verde", en: "Green" } },
-        { id: "amber", hex: "#ffb000", name: { pt: "Ambar", en: "Amber" } },
+        { id: "amber", hex: "#ffb000", name: { pt: "Âmbar", en: "Amber" } },
         { id: "red", hex: "#ff3b30", name: { pt: "Vermelho", en: "Red" } },
       ];
       const THEME_STORAGE_KEY = "op-dashboard-theme";
@@ -973,7 +973,7 @@
       function applyTexts() {
         document.documentElement.lang = currentLang === "pt" ? "pt-BR" : "en";
         langToggle.textContent = currentLang.toUpperCase();
-        langToggle.title = currentLang === "pt" ? "Switch to English" : "Mudar para portugues";
+        langToggle.title = currentLang === "pt" ? "Switch to English" : "Mudar para português";
         themeToggle.textContent = currentThemeName();
         renderThemeMenu();
         tempLabel.textContent = t("temp");

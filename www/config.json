@@ -7,7 +7,7 @@
     {
       "id": "jellyfin",
       "name": "Jellyfin",
-      "description": { "pt": "filmes, series e musica", "en": "movies, shows and music" },
+      "description": { "pt": "filmes, séries e música", "en": "movies, shows and music" },
       "icon": "JF",
       "accent": "blue",
       "port": 8096,
