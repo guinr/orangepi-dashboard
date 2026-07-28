@@ -139,6 +139,16 @@
         --accent: var(--teal);
       }
 
+      /* Network cards are narrower than the old full-width 3-column layout,
+         and interface names vary a lot in length (eth0 vs tailscale0) - stack
+         the name/status above the Down/Up stats instead of competing for
+         space on one line, so long names never force a wrap. */
+      .net-cards .stat-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+      }
+
       .micro-card.temp {
         --accent: var(--red);
       }
