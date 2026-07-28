@@ -345,6 +345,26 @@
         border-radius: 999px;
       }
 
+      .layout {
+        display: grid;
+        gap: 8px;
+        grid-template-columns: 1fr;
+      }
+
+      .services-column {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        min-width: 0;
+      }
+
+      @media (min-width: 900px) {
+        .layout {
+          grid-template-columns: 1fr 1fr;
+          align-items: start;
+        }
+      }
+
       .grid {
         display: grid;
         gap: 8px;
@@ -508,8 +528,7 @@
         </div>
       </header>
 
-      <section class="hero" aria-label="System summary">
-        <div></div>
+      <div class="layout">
         <aside class="status-panel" aria-label="System status">
           <div class="micro-metrics">
             <article class="micro-card cpu">
@@ -542,10 +561,12 @@
             <div class="net-cards" id="net-cards"></div>
           </div>
         </aside>
-      </section>
 
-      <input type="search" class="service-search" id="service-search" />
-      <section class="grid" id="services-grid" aria-label="Services"></section>
+        <section class="services-column" aria-label="Services">
+          <input type="search" class="service-search" id="service-search" />
+          <div class="grid" id="services-grid"></div>
+        </section>
+      </div>
     </main>
 
     <script>
